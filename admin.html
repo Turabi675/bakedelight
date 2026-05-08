@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Bake Delight</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(45, 20, 8, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+        .admin-modal-content {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 800px;
+            border-top: 5px solid var(--primary-color);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .admin-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .admin-form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group-full {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Bake Delight Admin</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Back to Site</a></li>
+            </ul>
+        </nav>
+        <div class="header-drip"></div>
+    </header>
+
+    <main class="section">
+        <!-- Login Form -->
+        <div class="admin-login" id="loginForm">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">Admin Login</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Password">
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="admin-dashboard" id="dashboard">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="color: var(--primary-color);">Product Management</h2>
+                <button class="btn btn-secondary" onclick="openAddModal()">Add New Product</button>
+            </div>
+            
+            <div class="admin-products-list">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Weight</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="productModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <h2 id="modalTitle" style="color: var(--primary-color);">Add Product</h2>
+            <form id="productForm" onsubmit="saveProductData(event)" style="margin-top: 1.5rem;">
+                <input type="hidden" id="prodId">
+                <div class="admin-form-grid">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="prodName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category (for Products Page)</label>
+                        <select id="prodCategory" required>
+                            <option value="Cakes">Cakes</option>
+                            <option value="Cookies">Cookies</option>
+                            <option value="Pastries">Pastries</option>
+                            <option value="Other Delights">Other Delights</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Home Section (Theme)</label>
+                        <select id="prodTheme" required>
+                            <option value="Chocolate">Chocolate</option>
+                            <option value="Cream">Cream</option>
+                            <option value="Dry Fruit">Dry Fruit</option>
+                            <option value="None">None (Don't show on Home)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (PKR)</label>
+                        <input type="number" step="0.01" id="prodPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight & Unit</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" step="0.01" id="prodWeight" placeholder="e.g. 1" required style="flex: 2;">
+                            <select id="prodWeightUnit" style="flex: 1;">
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="lb">lb (pound)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group-full">
+                        <label>Product Image</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
+                            <div>
+                                <input type="file" id="prodImageUpload" accept="image/*" onchange="previewImage(event)" style="margin-bottom: 0.5rem;">
+                                <p style="font-size: 0.8rem; color: #888;">OR enter URL below:</p>
+                                <input type="url" id="prodImage" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div id="imagePreviewContainer" style="width: 100%; height: 120px; border: 2px dashed #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9;">
+                                <img id="imagePreview" src="" style="max-width: 100%; max-height: 100%; display: none;">
+                                <span id="previewPlaceholder" style="color: #aaa; font-size: 0.8rem;">Preview</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group-full">
+                        <label>Description</label>
+                        <textarea id="prodDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label>
+                            <input type="checkbox" id="prodBestSeller"> Best Seller
+                        </label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-golden" style="flex: 1;">Save Changes</button>
+                    <button type="button" class="btn" style="flex: 1; background: #666;" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const pass = document.getElementById('password').value;
+            if (pass === 'admin123') { // Simple mock authentication
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                renderAdminProducts();
+            } else {
+                alert('Invalid password');
+            }
+        }
+
+        function renderAdminProducts() {
+            const products = getProducts();
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.id}</td>
+                    <td><img src="${p.image}" alt="img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"></td>
+                    <td>${p.name}</td>
+                    <td>${p.category}</td>
+                    <td>${p.weight ? p.weight + ' ' + (p.weightUnit || '') : 'N/A'}</td>
+                    <td>Rs. ${p.price.toFixed(2)}</td>
+                    <td>${p.hidden ? '<span style="color:#D0021B; font-weight: bold;">Hidden</span>' : '<span style="color:#2E7D32; font-weight: bold;">Active</span>'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="openEditModal(${p.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn hide-btn" onclick="toggleHide(${p.id})"><i class="fas ${p.hidden ? 'fa-eye' : 'fa-eye-slash'}"></i></button>
+                        <button class="action-btn delete-btn" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const modal = document.getElementById('productModal');
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Product';
+            document.getElementById('productForm').reset();
+            document.getElementById('prodId').value = '';
+            modal.style.display = 'flex';
+        }
+
+        function openEditModal(id) {
+            const products = getProducts();
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Product';
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodCategory').value = p.category;
+            document.getElementById('prodTheme').value = p.theme || 'None';
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodWeight').value = p.weight || '';
+            document.getElementById('prodWeightUnit').value = p.weightUnit || 'kg';
+            document.getElementById('prodImage').value = p.image;
+            document.getElementById('prodDescription').value = p.description || '';
+
+            // Set preview
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('previewPlaceholder');
+            if (p.image) {
+                preview.src = p.image;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+
+            document.getElementById('prodBestSeller').checked = p.bestSeller || false;
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            // Reset preview
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('previewPlaceholder').style.display = 'block';
+        }
+
+        function previewImage(event) {
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('previewPlaceholder');
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function saveProductData(e) {
+            e.preventDefault();
+            let products = getProducts();
+            const id = document.getElementById('prodId').value;
+            
+            let imageUrl = document.getElementById('prodImage').value;
+            const imageUpload = document.getElementById('prodImageUpload').files[0];
+
+            if (imageUpload) {
+                imageUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(imageUpload);
+                });
+            }
+
+            const productData = {
+                name: document.getElementById('prodName').value,
+                category: document.getElementById('prodCategory').value,
+                theme: document.getElementById('prodTheme').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                weight: document.getElementById('prodWeight').value,
+                weightUnit: document.getElementById('prodWeightUnit').value,
+                image: imageUrl,
+                description: document.getElementById('prodDescription').value,
+                bestSeller: document.getElementById('prodBestSeller').checked
+            };
+
+            if (id) {
+                // Edit
+                const index = products.findIndex(x => x.id == id);
+                if (index > -1) {
+                    products[index] = { ...products[index], ...productData };
+                }
+            } else {
+                // Add
+                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({ id: newId, ...productData, hidden: false });
+            }
+            
+            saveProducts(products);
+            closeModal();
+            renderAdminProducts();
+        }
+
+        function toggleHide(id) {
+            let products = getProducts();
+            const index = products.findIndex(x => x.id === id);
+            if (index > -1) {
+                products[index].hidden = !products[index].hidden;
+                saveProducts(products);
+                renderAdminProducts();
+            }
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                let products = getProducts();
+                products = products.filter(x => x.id !== id);
+                saveProducts(products);
+                renderAdminProducts();
+            }
+        }
+    </script>
+</body>
+</html>

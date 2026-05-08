@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Bake Delight</title>
+    <meta name="description" content="Learn about our passion for baking and quality ingredients.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Bake Delight</a>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active">About Us</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li>
+                    <div class="cart-icon" onclick="openCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <div class="header-drip"></div>
+    </header>
+
+    <main>
+        <section class="section">
+            <h1 class="section-title">Our Story</h1>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Welcome to Bake Delight, a boutique home bakery where passion meets the oven. What started as a family tradition has blossomed into a beloved local destination for handcrafted treats.</p>
+                    <p>We believe that exceptional taste begins with exceptional ingredients. That's why we source only the finest, pure components—from rich Belgian chocolate to locally milled flour and farm-fresh eggs.</p>
+                    <p>Every cake, cookie, and pastry is baked in small batches in our home kitchen, ensuring that each bite delivers a taste of warmth, comfort, and luxury. We don't just bake; we craft memories for your special moments.</p>
+                    <br>
+                    <a href="products.html" class="btn btn-secondary">Explore Our Menu</a>
+                </div>
+                <div class="about-img">
+                    <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800" alt="Baking Process">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <p>&copy; 2026 Bake Delight. All Rights Reserved.</p>
+            </div>
+            <div class="footer-center">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-right">
+                <a href="https://wa.me/923295431127" target="_blank" class="wa-chat-btn">
+                    <i class="fab fa-whatsapp"></i> Chat with Us
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-content">
+            <button id="closeCart" class="close-cart"><i class="fas fa-times"></i></button>
+            <h2>Your Cart</h2>
+            <div id="cartItems" class="cart-items"></div>
+            <div id="cartTotal" class="cart-total">Total: Rs. 0.00</div>
+            
+            <form id="checkoutForm" onsubmit="processCheckout(event)">
+                <div class="form-group">
+                    <label for="customerName">Name</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Phone Number</label>
+                    <input type="tel" id="customerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryTime">Delivery Date & Time (Requires 24hr Notice)</label>
+                    <input type="datetime-local" id="deliveryTime" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Checkout via WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
